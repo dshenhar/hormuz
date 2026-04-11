@@ -59,6 +59,7 @@ function sfx(type) {
       tanker:  () => { o.type='sine';     o.frequency.setValueAtTime(260,t); o.frequency.exponentialRampToValueAtTime(130,t+.5);  g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.001,t+.5);  o.start(t); o.stop(t+.5); },
       sam:     () => { o.type='sine';     o.frequency.setValueAtTime(1200,t);o.frequency.exponentialRampToValueAtTime(400,t+.3);  g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.3);  o.start(t); o.stop(t+.3); },
       over:    () => { o.type='sawtooth'; o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(55,t+1.2);  g.gain.setValueAtTime(.25,t); g.gain.exponentialRampToValueAtTime(.001,t+1.2); o.start(t); o.stop(t+1.2); },
+      shield:  () => { o.type='sine'; o.frequency.setValueAtTime(440,t); o.frequency.setValueAtTime(660,t+0.1); o.frequency.setValueAtTime(880,t+0.2); o.frequency.setValueAtTime(1100,t+0.3); g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.001,t+0.5); o.start(t); o.stop(t+0.5); },
     };
     if (p[type]) p[type]();
   } catch(e) {}
@@ -81,6 +82,7 @@ let waveTimer  = 0;     // frames since wave start
 let waveClearing = false;
 let waveClearTimer = 0;
 let bgScroll   = 0;     // background scroll offset
+let shieldTimer = 0;    // frames remaining for Israel shield (600 = 10s)
 
 // Entities
 let player, bullets = [], enemies = [], eBullets = [], particles = [],
@@ -108,7 +110,7 @@ function waveConfig(w) {
 function initGame() {
   score = 0; wave = 1; lives = 3; bombs = 2;
   strait = 100; tankerBonus = 0; survivalTime = 0;
-  frameCount = 0; tripleTimer = 0; speedTimer = 0;
+  frameCount = 0; tripleTimer = 0; speedTimer = 0; shieldTimer = 0;
   waveTimer = 0; waveClearing = false; waveClearTimer = 0;
   bgScroll = 0;
   bullets = []; enemies = []; eBullets = []; particles = [];
@@ -824,6 +826,16 @@ function drawHUD() {
     ctx.fillText('TRIPLE!', 668, 18);
   }
 
+  // Israel Shield indicator
+  if (shieldTimer > 0) {
+    ctx.save();
+    ctx.shadowColor = '#4499ff'; ctx.shadowBlur = 10;
+    ctx.fillStyle = '#4499ff';
+    ctx.font = 'bold 11px Courier New';
+    ctx.fillText('✡ SHIELD ' + Math.ceil(shieldTimer/60) + 's', 760, 18);
+    ctx.restore();
+  }
+
   // Strait health bar
   ctx.fillStyle='rgba(0,0,0,0.5)';
   ctx.fillRect(6, 30, 200, 12);
@@ -924,16 +936,21 @@ function drawTanker(t) {
 function drawPowerup(p) {
   ctx.save();
   ctx.translate(p.x, p.y);
-  const cols = { triple:'#ff88ff', bomb:'#ff8800', life:'#00ff88', speed:'#00eeff' };
-  const labels = { triple:'3X', bomb:'BOMB', life:'♥', speed:'FAST' };
+  const cols   = { triple:'#ff88ff', bomb:'#ff8800', life:'#00ff88', speed:'#00eeff', shield:'#0055ff' };
+  const labels = { triple:'3X', bomb:'BOMB', life:'♥', speed:'FAST', shield:'✡' };
   ctx.shadowColor = cols[p.type] || '#fff';
-  ctx.shadowBlur = 8;
+  ctx.shadowBlur = 10;
   ctx.fillStyle = cols[p.type] || '#fff';
-  ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#000';
-  ctx.font = 'bold 7px Courier New';
+  ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI*2); ctx.fill();
+  // Shield powerup: draw mini Star of David + blue/white rings
+  if (p.type === 'shield') {
+    ctx.strokeStyle = '#aaddff'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI*2); ctx.stroke();
+  }
+  ctx.fillStyle = p.type === 'shield' ? '#ffffff' : '#000';
+  ctx.font = p.type === 'shield' ? 'bold 10px Arial' : 'bold 7px Courier New';
   ctx.textAlign='center';
-  ctx.fillText(labels[p.type]||'?', 0, 3);
+  ctx.fillText(labels[p.type]||'?', 0, p.type==='shield' ? 4 : 3);
   ctx.restore();
 }
 
@@ -1156,6 +1173,7 @@ function update() {
   if (player.invTimer > 0) player.invTimer--;
   if (tripleTimer > 0) tripleTimer--;
   if (speedTimer > 0) speedTimer--;
+  if (shieldTimer > 0) shieldTimer--;
 
   // Bullets update
   for (let i = bullets.length-1; i >= 0; i--) {
@@ -1176,7 +1194,7 @@ function update() {
           sfx('explode');
           // Powerup drop 30%
           if (Math.random()<0.3) {
-            const types=['triple','bomb','life','speed'];
+            const types=['triple','bomb','life','speed','shield'];
             powerups.push({x:e.x, y:e.y, vy:1.2, type:types[Math.floor(Math.random()*types.length)]});
           }
           enemies.splice(j,1);
@@ -1268,9 +1286,15 @@ function update() {
     // Hit player
     if (player.invTimer <= 0 && rectHit(b.x,b.y,4,4, player.x,player.y,player.w*0.55,player.h*0.55)) {
       eBullets.splice(i,1);
-      lives--; player.invTimer=120;
-      spawnExplosion(player.x,player.y,10,'#00eeff');
-      sfx('hit');
+      if (shieldTimer > 0) {
+        // Shield absorbs the hit
+        spawnExplosion(b.x,b.y,6,'#0055ff');
+        sfx('hit');
+      } else {
+        lives--; player.invTimer=120;
+        spawnExplosion(player.x,player.y,10,'#00eeff');
+        sfx('hit');
+      }
     }
   }
 
@@ -1322,8 +1346,12 @@ function update() {
     }
     // Player collision with boss
     if (player.invTimer<=0 && rectHit(player.x,player.y,player.w*0.55,player.h*0.55, boss.x,boss.y,boss.w*0.7,boss.h*0.7)) {
-      lives--; player.invTimer=120; sfx('hit');
-      spawnExplosion(player.x,player.y,10,'#00eeff');
+      if (shieldTimer > 0) {
+        spawnExplosion(player.x,player.y,8,'#0055ff'); sfx('hit');
+      } else {
+        lives--; player.invTimer=120; sfx('hit');
+        spawnExplosion(player.x,player.y,10,'#00eeff');
+      }
     }
   }
 
@@ -1373,9 +1401,14 @@ function update() {
     // Hit player
     if (player.invTimer<=0 && circHit(s.x,s.y,7, player.x,player.y,28)) {
       sams.splice(i,1);
-      lives--; player.invTimer=180;
-      spawnExplosion(player.x,player.y,14,'#ff0000');
-      sfx('bigboom');
+      if (shieldTimer > 0) {
+        spawnExplosion(s.x,s.y,8,'#0055ff');
+        sfx('hit');
+      } else {
+        lives--; player.invTimer=180;
+        spawnExplosion(player.x,player.y,14,'#ff0000');
+        sfx('bigboom');
+      }
     }
   }
 
@@ -1419,6 +1452,7 @@ function update() {
       else if (p.type==='bomb') bombs++;
       else if (p.type==='life') lives=Math.min(lives+1,5);
       else if (p.type==='speed') speedTimer=240;
+      else if (p.type==='shield') { shieldTimer=600; sfx('shield'); }
       powerups.splice(i,1);
     }
   }
@@ -1454,6 +1488,97 @@ function update() {
     state = 'gameover';
     sfx('over');
   }
+}
+
+// ─── DRAW ISRAEL SHIELD ──────────────────────────────────────────
+function drawShield() {
+  if (shieldTimer <= 0) return;
+  const cx = player.x, cy = player.y;
+  const radius = 58;
+  const count = 6;
+  const angle = (frameCount * 0.04); // orbit speed
+
+  // Pulsing shield ring
+  const alpha = 0.25 + 0.15 * Math.sin(frameCount * 0.15);
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#0055dd';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = '#4499ff';
+  ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // 6 orbiting mini Israeli F-16 planes
+  for (let i = 0; i < count; i++) {
+    const a = angle + (i / count) * Math.PI * 2;
+    const px = cx + Math.cos(a) * radius;
+    const py = cy + Math.sin(a) * radius;
+
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(a + Math.PI / 2); // nose points along orbit
+
+    // Mini F-16 silhouette
+    ctx.shadowColor = '#aaddff'; ctx.shadowBlur = 8;
+
+    // Fuselage
+    ctx.fillStyle = '#cccccc';
+    ctx.beginPath();
+    ctx.moveTo(0, -8); ctx.lineTo(2, 0); ctx.lineTo(2, 6); ctx.lineTo(-2, 6); ctx.lineTo(-2, 0);
+    ctx.closePath(); ctx.fill();
+
+    // Delta wings
+    ctx.fillStyle = '#aaaaaa';
+    ctx.beginPath();
+    ctx.moveTo(-2, 2); ctx.lineTo(-11, 8); ctx.lineTo(-2, 6);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(2, 2); ctx.lineTo(11, 8); ctx.lineTo(2, 6);
+    ctx.closePath(); ctx.fill();
+
+    // Israeli flag on wing (blue Star of David stripes)
+    // Left wing flag
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(-10, 3, 8, 5);
+    ctx.strokeStyle = '#0038b8'; ctx.lineWidth = 0.8;
+    ctx.strokeRect(-10, 3, 8, 5);
+    // Blue stripes
+    ctx.fillStyle = '#0038b8';
+    ctx.fillRect(-10, 3.4, 8, 1.2);
+    ctx.fillRect(-10, 6.4, 8, 1.2);
+    // Star of David (simplified ✡ as text)
+    ctx.fillStyle = '#0038b8';
+    ctx.font = '3.5px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('✡', -6, 6.5);
+
+    // Exhaust flame (tiny)
+    ctx.fillStyle = '#ff8800';
+    ctx.beginPath();
+    ctx.moveTo(-1.5, 6); ctx.lineTo(1.5, 6);
+    ctx.lineTo(0, 6 + 2 + Math.random() * 2);
+    ctx.closePath(); ctx.fill();
+
+    ctx.restore();
+  }
+
+  // Shield timer bar (below HUD)
+  const barW = 120;
+  const bx = cx - barW / 2;
+  const by = cy + 72;
+  const frac = shieldTimer / 600;
+  ctx.save();
+  ctx.globalAlpha = 0.8;
+  ctx.fillStyle = '#001133';
+  ctx.fillRect(bx, by, barW, 6);
+  ctx.fillStyle = frac > 0.5 ? '#0055ff' : frac > 0.25 ? '#4488ff' : '#aaaaff';
+  ctx.fillRect(bx, by, barW * frac, 6);
+  ctx.strokeStyle = '#4499ff'; ctx.lineWidth = 1;
+  ctx.strokeRect(bx, by, barW, 6);
+  ctx.restore();
 }
 
 // ─── DRAW BULLET ─────────────────────────────────────────────────
@@ -1528,6 +1653,9 @@ function draw() {
   if (player.invTimer <= 0 || Math.floor(frameCount/4)%2===0) {
     drawPlayer(player.x, player.y);
   }
+
+  // Israel shield orbiting planes
+  drawShield();
 
   // HUD
   drawHUD();
