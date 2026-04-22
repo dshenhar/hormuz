@@ -2,18 +2,160 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>HORMUZ DEFENDER</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Hormuz Defender — Free Online Arcade Game | Protect the Strait of Hormuz</title>
+<meta name="description" content="Hormuz Defender is a free browser-based arcade shooter. Pilot an F-22 jet, intercept Shahed drones, protect oil tankers, and defend the Strait of Hormuz. Play free online — no download required.">
+<meta name="keywords" content="hormuz defender, free arcade game, browser game, jet fighter game, drone shooter, online game, strategy game, strait of hormuz game">
+<meta property="og:title" content="Hormuz Defender — Free Online Arcade Game">
+<meta property="og:description" content="Pilot an F-22 jet and defend the Strait of Hormuz from drone attacks. Free browser arcade game — no download needed.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://hormuz-defender.vercel.app/">'
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8340537196634750"
      crossorigin="anonymous"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; overflow:hidden; font-family:'Courier New',monospace; }
-  #wrap { position:relative; display:inline-block; }
-  canvas { display:block; max-width:100vw; max-height:calc(100vh - 28px); image-rendering:pixelated; }
+  body { background:#000; display:flex; flex-direction:column; align-items:center; min-height:100vh; font-family:'Courier New',monospace; touch-action:none; overflow-x:hidden; }
+  #wrap { position:relative; display:inline-block; width:100%; max-width:900px; }
+  canvas { display:block; width:100%; height:auto; max-height:calc(100vh - 28px); image-rendering:pixelated; touch-action:none; }
   #scanlines { position:absolute; top:0; left:0; width:100%; height:100%;
     background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,0,0,.13) 3px,rgba(0,0,0,.13) 4px);
     pointer-events:none; }
   #ctrl { color:#556; font:11px 'Courier New',monospace; margin-top:5px; text-align:center; letter-spacing:1px; }
+
+  /* ── Touch Controls ── */
+  #touch-controls {
+    display: none;
+    width: 100%;
+    max-width: 900px;
+    padding: 10px 16px;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.5);
+    border-top: 1px solid rgba(0,238,255,0.2);
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  #joystick-zone {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  #joystick-base {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(0,238,255,0.07);
+    border: 2px solid rgba(0,238,255,0.35);
+    position: relative;
+    touch-action: none;
+    user-select: none;
+  }
+  #joystick-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(0,238,255,0.45);
+    border: 2px solid #00eeff;
+    box-shadow: 0 0 12px rgba(0,238,255,0.6);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  #action-zone {
+    display: flex;
+    flex-direction: row;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .touch-btn {
+    border-radius: 50%;
+    border: 2px solid;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.1;
+    flex-shrink: 0;
+  }
+  #btn-fire {
+    width: 100px;
+    height: 100px;
+    font-size: 15px;
+    background: rgba(0,238,255,0.15);
+    border-color: #00eeff;
+    color: #00eeff;
+    box-shadow: 0 0 16px rgba(0,238,255,0.3);
+  }
+  #btn-fire:active { background: rgba(0,238,255,0.4); }
+  #btn-bomb {
+    width: 72px;
+    height: 72px;
+    font-size: 12px;
+    background: rgba(255,102,34,0.15);
+    border-color: #ff6622;
+    color: #ff6622;
+    box-shadow: 0 0 10px rgba(255,102,34,0.25);
+  }
+  #btn-bomb:active { background: rgba(255,102,34,0.4); }
+  #btn-pause {
+    width: 54px;
+    height: 54px;
+    font-size: 11px;
+    border-radius: 10px;
+    background: rgba(255,238,34,0.1);
+    border-color: #ffee22;
+    color: #ffee22;
+  }
+  #btn-pause:active { background: rgba(255,238,34,0.3); }
+
+  @media (max-height: 600px) and (orientation: landscape) {
+    #touch-controls { padding: 6px 12px; }
+    #joystick-zone { width: 110px; height: 110px; }
+    #joystick-base { width: 96px; height: 96px; }
+    #btn-fire { width: 80px; height: 80px; font-size: 13px; }
+    #btn-bomb { width: 60px; height: 60px; font-size: 11px; }
+    #btn-pause { width: 46px; height: 46px; font-size: 10px; }
+  }
+
+  /* ── Page Content (for SEO / AdSense) ── */
+  #page-content {
+    width: 100%;
+    max-width: 900px;
+    color: #aaa;
+    font-family: 'Courier New', monospace;
+    padding: 28px 20px 40px;
+    background: #000;
+  }
+  #page-content h1 { color:#00eeff; font-size:22px; margin-bottom:10px; letter-spacing:2px; }
+  #page-content h2 { color:#ff8800; font-size:15px; margin:22px 0 8px; letter-spacing:1px; }
+  #page-content p  { font-size:13px; line-height:1.8; color:#889; margin-bottom:8px; }
+  #page-content ul { font-size:13px; line-height:1.9; color:#889; margin-left:18px; }
+  #page-content a  { color:#00eeff; text-decoration:none; }
+  #page-content a:hover { text-decoration:underline; }
+  #page-content .tag-row { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+  #page-content .tag {
+    background:rgba(0,238,255,0.08); border:1px solid rgba(0,238,255,0.25);
+    color:#00eeff; font-size:11px; padding:3px 10px; border-radius:4px; letter-spacing:1px;
+  }
+  #page-content footer { margin-top:32px; border-top:1px solid #222; padding-top:14px; font-size:11px; color:#444; text-align:center; }
+  #page-content footer a { color:#556; }
 </style>
 </head>
 <body>
@@ -22,6 +164,19 @@
   <div id="scanlines"></div>
 </div>
 <div id="ctrl">ARROWS/WASD: Move &nbsp;|&nbsp; SPACE: Fire &nbsp;|&nbsp; B: Bomb &nbsp;|&nbsp; P: Pause &nbsp;|&nbsp; T: Title &nbsp;|&nbsp; ⚠ DON'T SHOOT FRIENDLY TANKERS!</div>
+
+<div id="touch-controls">
+  <div id="joystick-zone">
+    <div id="joystick-base">
+      <div id="joystick-thumb"></div>
+    </div>
+  </div>
+  <div id="action-zone">
+    <button id="btn-pause" class="touch-btn">PAUSE</button>
+    <button id="btn-bomb"  class="touch-btn">BOMB</button>
+    <button id="btn-fire"  class="touch-btn">FIRE</button>
+  </div>
+</div>
 <script>
 // ================================================================
 //  HORMUZ DEFENDER — Full Arcade Edition
@@ -37,6 +192,7 @@ const WATER_W = WATER_R - WATER_L; // 570px
 
 // ─── INPUT ───────────────────────────────────────────────────────
 const keys = {};
+const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 document.addEventListener('keydown', e => { keys[e.key] = true;  onKey(e); });
 document.addEventListener('keyup',   e => { keys[e.key] = false; });
 
@@ -1039,7 +1195,7 @@ function drawTitle() {
 
   ctx.fillStyle= (Math.floor(Date.now()/400)%2===0) ? '#00ff88' : '#00cc66';
   ctx.font='bold 18px Courier New';
-  ctx.fillText('[ PRESS SPACE OR ENTER TO START ]', W/2, 520);
+  ctx.fillText(isTouchDevice ? '[ TAP SCREEN TO START ]' : '[ PRESS SPACE OR ENTER TO START ]', W/2, 520);
 }
 
 // ─── GAME OVER SCREEN ────────────────────────────────────────────
@@ -1072,7 +1228,7 @@ function drawGameOver() {
 
   ctx.fillStyle= (Math.floor(Date.now()/400)%2===0) ? '#00ff88' : '#00cc66';
   ctx.font='bold 16px Courier New';
-  ctx.fillText('[ SPACE / ENTER to Restart  |  T for Title ]', W/2, 470);
+  ctx.fillText(isTouchDevice ? '[ TAP SCREEN TO RESTART ]' : '[ SPACE / ENTER to Restart  |  T for Title ]', W/2, 470);
 }
 
 // ─── PAUSE SCREEN ────────────────────────────────────────────────
@@ -1683,11 +1839,199 @@ function loop() {
   }
 }
 
+// ─── TOUCH CONTROLS ──────────────────────────────────────────────
+function initTouchControls() {
+  const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  if (!isTouch) return;
+
+  // Show touch UI, hide keyboard hint
+  document.getElementById('touch-controls').style.display = 'flex';
+  document.getElementById('ctrl').style.display = 'none';
+
+  const joystickBase  = document.getElementById('joystick-base');
+  const joystickThumb = document.getElementById('joystick-thumb');
+  const btnFire  = document.getElementById('btn-fire');
+  const btnBomb  = document.getElementById('btn-bomb');
+  const btnPause = document.getElementById('btn-pause');
+
+  const RADIUS = 38; // max thumb travel px from center
+  let joystickTouchId = null;
+  let jcx = 0, jcy = 0; // joystick center in page coords
+
+  function updateThumb(dx, dy) {
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist > RADIUS) { dx = dx/dist*RADIUS; dy = dy/dist*RADIUS; }
+    // position thumb around the center of the base
+    const half = joystickBase.offsetWidth / 2;
+    joystickThumb.style.left = (half + dx) + 'px';
+    joystickThumb.style.top  = (half + dy) + 'px';
+    const thresh = 14;
+    keys['ArrowLeft']  = dx < -thresh;
+    keys['ArrowRight'] = dx > thresh;
+    keys['ArrowUp']    = dy < -thresh;
+    keys['ArrowDown']  = dy > thresh;
+  }
+
+  function resetThumb() {
+    const half = joystickBase.offsetWidth / 2;
+    joystickThumb.style.left = half + 'px';
+    joystickThumb.style.top  = half + 'px';
+    keys['ArrowLeft'] = keys['ArrowRight'] = keys['ArrowUp'] = keys['ArrowDown'] = false;
+  }
+
+  joystickBase.addEventListener('touchstart', e => {
+    e.preventDefault();
+    initAudio();
+    if (state === 'title' || state === 'gameover') { initGame(); state = 'playing'; return; }
+    if (joystickTouchId !== null) return;
+    const t = e.changedTouches[0];
+    joystickTouchId = t.identifier;
+    const r = joystickBase.getBoundingClientRect();
+    jcx = r.left + r.width  / 2;
+    jcy = r.top  + r.height / 2;
+    updateThumb(t.clientX - jcx, t.clientY - jcy);
+  }, { passive: false });
+
+  joystickBase.addEventListener('touchmove', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === joystickTouchId) updateThumb(t.clientX - jcx, t.clientY - jcy);
+    }
+  }, { passive: false });
+
+  joystickBase.addEventListener('touchend', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === joystickTouchId) { joystickTouchId = null; resetThumb(); }
+    }
+  }, { passive: false });
+
+  joystickBase.addEventListener('touchcancel', e => {
+    joystickTouchId = null; resetThumb();
+  }, { passive: false });
+
+  // FIRE – hold to auto-fire (the update loop already handles keys[' '])
+  btnFire.addEventListener('touchstart', e => {
+    e.preventDefault();
+    initAudio();
+    if (state === 'title' || state === 'gameover') { initGame(); state = 'playing'; return; }
+    keys[' '] = true;
+  }, { passive: false });
+  btnFire.addEventListener('touchend',   e => { e.preventDefault(); keys[' '] = false; }, { passive: false });
+  btnFire.addEventListener('touchcancel',e => { keys[' '] = false; }, { passive: false });
+
+  // BOMB
+  btnBomb.addEventListener('touchstart', e => {
+    e.preventDefault();
+    initAudio();
+    if (state === 'playing') deployBomb();
+  }, { passive: false });
+
+  // PAUSE
+  btnPause.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (state === 'playing') state = 'paused';
+    else if (state === 'paused') state = 'playing';
+  }, { passive: false });
+
+  // Tap anywhere on canvas to start / restart
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    initAudio();
+    if (state === 'title' || state === 'gameover') { initGame(); state = 'playing'; }
+  }, { passive: false });
+}
+
 // ─── BOOT ─────────────────────────────────────────────────────────
 bgScroll = 0;
 // Pre-init player for title draw (won't be used until game starts)
 player = { x: WATER_L+WATER_W/2, y: H-100, w:90, h:72, vx:0, vy:0, shootTimer:0, invTimer:0 };
+initTouchControls();
 loop();
 </script>
+
+<!-- ══ PAGE CONTENT — visible to Google & users ══ -->
+<section id="page-content">
+
+  <h1>HORMUZ DEFENDER</h1>
+  <p>
+    Hormuz Defender is a free browser-based arcade shooter inspired by the geopolitical importance
+    of the Strait of Hormuz — one of the world's most critical oil shipping chokepoints.
+    Pilot an F-22 stealth jet, intercept waves of Shahed kamikaze drones, protect friendly oil
+    tankers, and keep the strait open for international shipping.
+  </p>
+
+  <div class="tag-row">
+    <span class="tag">FREE TO PLAY</span>
+    <span class="tag">NO DOWNLOAD</span>
+    <span class="tag">BROWSER GAME</span>
+    <span class="tag">MOBILE FRIENDLY</span>
+    <span class="tag">ARCADE SHOOTER</span>
+  </div>
+
+  <h2>HOW TO PLAY</h2>
+  <ul>
+    <li><strong>Move</strong> — Arrow keys or WASD (desktop) / Virtual joystick (mobile)</li>
+    <li><strong>Fire</strong> — Space bar (hold for auto-fire) / FIRE button on mobile</li>
+    <li><strong>Bomb</strong> — B key / BOMB button — clears all enemies on screen</li>
+    <li><strong>Pause</strong> — P key / PAUSE button</li>
+    <li><strong>⚠ Do NOT shoot friendly tankers</strong> — you lose a life and strait health</li>
+  </ul>
+
+  <h2>GAME FEATURES</h2>
+  <ul>
+    <li>Endless wave-based progression — each wave is faster and harder</li>
+    <li>3 enemy types: Fast Drones, Patrol Drones, and Heavy Drones</li>
+    <li>Boss battles every 5th wave</li>
+    <li>Kharg Island fires SAM missiles — shoot them down for bonus points</li>
+    <li>Power-ups: Triple Shot, Extra Bomb, Extra Life, Speed Boost, Israel Shield</li>
+    <li>Friendly tankers to protect — escort them safely through the strait</li>
+    <li>Sea mines dropped by enemies that block the water lane</li>
+    <li>Strait Health meter — let too many enemies through and it's game over</li>
+    <li>Retro arcade aesthetic with CRT scanline effect</li>
+    <li>Full sound effects generated in real time via Web Audio API</li>
+  </ul>
+
+  <h2>ABOUT THE STRAIT OF HORMUZ</h2>
+  <p>
+    The Strait of Hormuz is a narrow waterway between Iran and Oman connecting the Persian Gulf
+    to the Gulf of Oman. Approximately 20% of the world's petroleum and 25% of global liquefied
+    natural gas pass through this strait every day, making it one of the most strategically
+    important maritime chokepoints on Earth.
+  </p>
+  <p>
+    Key locations featured in the game include <strong>Bandar Abbas</strong> (Iran's main naval base),
+    <strong>Kharg Island</strong> (Iran's primary oil export terminal), <strong>Musandam Peninsula</strong>
+    (Oman's exclave), and the narrow strait itself — only 33 km wide at its narrowest point.
+  </p>
+
+  <h2>TIPS &amp; STRATEGY</h2>
+  <ul>
+    <li>Save bombs for boss waves or when overwhelmed by enemies</li>
+    <li>Collect the Shield power-up before boss fights — it absorbs one hit</li>
+    <li>Shoot SAM missiles from Kharg Island for +150 points each</li>
+    <li>Stay near the center of the water lane for maximum maneuverability</li>
+    <li>Triple Shot power-up dramatically increases your firepower — prioritize it</li>
+    <li>Watch the Strait Health bar — enemies and enemy bullets damage tankers</li>
+  </ul>
+
+  <h2>CONTROLS REFERENCE</h2>
+  <ul>
+    <li><strong>Arrow Keys / WASD</strong> — Move the jet</li>
+    <li><strong>Space</strong> — Fire (hold for continuous fire)</li>
+    <li><strong>B</strong> — Deploy bomb</li>
+    <li><strong>P</strong> — Pause / Resume</li>
+    <li><strong>T</strong> — Return to title screen</li>
+    <li><strong>Enter</strong> — Start / Restart game</li>
+  </ul>
+
+  <footer>
+    <p>Hormuz Defender &copy; 2026 &nbsp;|&nbsp;
+       <a href="/privacy.html">Privacy Policy</a> &nbsp;|&nbsp;
+       Free browser arcade game — no registration required
+    </p>
+  </footer>
+
+</section>
 </body>
 </html>
