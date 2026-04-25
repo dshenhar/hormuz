@@ -25,113 +25,189 @@
     pointer-events:none; }
   #ctrl { color:#556; font:11px 'Courier New',monospace; margin-top:5px; text-align:center; letter-spacing:1px; }
 
-  /* ── Touch Controls ── */
-  #touch-controls {
+  /* ── Mobile Intro Screen ── */
+  #mobile-intro {
     display: none;
-    width: 100%;
-    max-width: 900px;
-    padding: 10px 16px;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(0,0,0,0.5);
-    border-top: 1px solid rgba(0,238,255,0.2);
-    gap: 12px;
-    flex-shrink: 0;
+    position: fixed; inset: 0;
+    background: #000;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 3000;
+    padding: 32px 22px 120px;
+    font-family: 'Courier New', monospace;
+    color: #889;
   }
-  #joystick-zone {
-    width: 140px;
-    height: 140px;
+  #mobile-intro .mi-title {
+    color: #00eeff;
+    font-size: 30px;
+    text-align: center;
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+    text-shadow: 0 0 22px #00eeff88;
+  }
+  #mobile-intro .mi-sub {
+    color: #ff8800;
+    font-size: 16px;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+  #mobile-intro .mi-block {
+    background: rgba(0,238,255,0.05);
+    border: 1px solid rgba(0,238,255,0.15);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  #mobile-intro .mi-block h2 {
+    color: #ff8800;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  #mobile-intro .mi-block p,
+  #mobile-intro .mi-block li {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #889;
+  }
+  #mobile-intro .mi-block ul { margin-left: 16px; }
+  #mobile-intro .mi-controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  #mobile-intro .mi-ctrl-item {
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  #mobile-intro .mi-ctrl-item .icon { font-size: 26px; margin-bottom: 5px; }
+  #mobile-intro .mi-ctrl-item .label { color:#00eeff; font-size:11px; letter-spacing:1px; }
+  #mobile-intro .mi-ctrl-item .desc  { color:#667; font-size:10px; margin-top:2px; }
+  #mobile-intro .warn {
+    color: #ff4444;
+    font-size: 13px;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid rgba(255,68,68,0.3);
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  #mobile-play-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 400px;
+    height: 64px;
+    background: linear-gradient(135deg, #00aa88, #00eeff);
+    border: none;
+    border-radius: 14px;
+    color: #000;
+    font: bold 20px 'Courier New', monospace;
+    letter-spacing: 3px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 0 30px rgba(0,238,255,0.5);
+    z-index: 3001;
+  }
+
+  /* ── Mobile Game Mode (fullscreen canvas) ── */
+  #wrap.mobile-active {
+    position: fixed; inset: 0;
+    width: 100vw; height: 100vh;
+    max-width: none;
+    z-index: 2000;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    background: #000;
   }
-  #joystick-base {
-    width: 120px;
-    height: 120px;
+  #wrap.mobile-active canvas {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  /* ── Bomb button (mobile, fixed on screen) ── */
+  #mobile-bomb-btn {
+    display: none;
+    position: fixed;
+    left: 14px;
+    bottom: 80px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
-    background: rgba(0,238,255,0.07);
-    border: 2px solid rgba(0,238,255,0.35);
-    position: relative;
-    touch-action: none;
-    user-select: none;
-  }
-  #joystick-thumb {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(0,238,255,0.45);
-    border: 2px solid #00eeff;
-    box-shadow: 0 0 12px rgba(0,238,255,0.6);
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
-  #action-zone {
-    display: flex;
-    flex-direction: row;
-    gap: 14px;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-  .touch-btn {
-    border-radius: 50%;
-    border: 2px solid;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
+    background: rgba(255,102,34,0.18);
+    border: 2px solid #ff6622;
+    color: #ff6622;
+    font: bold 11px 'Courier New', monospace;
     letter-spacing: 1px;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
     user-select: none;
-    display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     text-align: center;
-    line-height: 1.1;
-    flex-shrink: 0;
+    z-index: 2500;
+    box-shadow: 0 0 14px rgba(255,102,34,0.25);
   }
-  #btn-fire {
-    width: 100px;
-    height: 100px;
-    font-size: 15px;
-    background: rgba(0,238,255,0.15);
-    border-color: #00eeff;
-    color: #00eeff;
-    box-shadow: 0 0 16px rgba(0,238,255,0.3);
+  #mobile-bomb-btn:active { background: rgba(255,102,34,0.45); }
+  #mobile-bomb-btn .bomb-icon { font-size: 22px; line-height:1; }
+  #mobile-bomb-btn .bomb-count { font-size: 10px; margin-top:2px; opacity:.8; }
+
+  /* ── Tilt indicator (shows tilt direction) ── */
+  #tilt-bar {
+    display: none;
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: 8px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 4px;
+    z-index: 2500;
+    overflow: hidden;
   }
-  #btn-fire:active { background: rgba(0,238,255,0.4); }
-  #btn-bomb {
-    width: 72px;
-    height: 72px;
-    font-size: 12px;
-    background: rgba(255,102,34,0.15);
-    border-color: #ff6622;
-    color: #ff6622;
-    box-shadow: 0 0 10px rgba(255,102,34,0.25);
+  #tilt-fill {
+    position: absolute;
+    top: 0; height: 100%;
+    width: 30%;
+    background: rgba(0,238,255,0.6);
+    border-radius: 4px;
+    left: 35%;
+    transition: left 0.05s linear;
   }
-  #btn-bomb:active { background: rgba(255,102,34,0.4); }
-  #btn-pause {
-    width: 54px;
-    height: 54px;
-    font-size: 11px;
+
+  /* ── Pause btn (mobile) ── */
+  #mobile-pause-btn {
+    display: none;
+    position: fixed;
+    right: 14px;
+    top: 14px;
+    width: 48px;
+    height: 48px;
     border-radius: 10px;
     background: rgba(255,238,34,0.1);
-    border-color: #ffee22;
+    border: 1px solid rgba(255,238,34,0.4);
     color: #ffee22;
-  }
-  #btn-pause:active { background: rgba(255,238,34,0.3); }
-
-  @media (max-height: 600px) and (orientation: landscape) {
-    #touch-controls { padding: 6px 12px; }
-    #joystick-zone { width: 110px; height: 110px; }
-    #joystick-base { width: 96px; height: 96px; }
-    #btn-fire { width: 80px; height: 80px; font-size: 13px; }
-    #btn-bomb { width: 60px; height: 60px; font-size: 11px; }
-    #btn-pause { width: 46px; height: 46px; font-size: 10px; }
+    font: bold 10px 'Courier New', monospace;
+    letter-spacing: 1px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2500;
   }
 
   /* ── Page Content (for SEO / AdSense) ── */
@@ -165,18 +241,75 @@
 </div>
 <div id="ctrl">ARROWS/WASD: Move &nbsp;|&nbsp; SPACE: Fire &nbsp;|&nbsp; B: Bomb &nbsp;|&nbsp; P: Pause &nbsp;|&nbsp; T: Title &nbsp;|&nbsp; ⚠ DON'T SHOOT FRIENDLY TANKERS!</div>
 
-<div id="touch-controls">
-  <div id="joystick-zone">
-    <div id="joystick-base">
-      <div id="joystick-thumb"></div>
+<!-- Mobile Intro Screen -->
+<div id="mobile-intro">
+  <div class="mi-title">HORMUZ</div>
+  <div class="mi-sub">DEFENDER</div>
+
+  <div class="warn">⚠ DO NOT SHOOT FRIENDLY TANKERS ⚠</div>
+
+  <div class="mi-block">
+    <h2>ABOUT THE GAME</h2>
+    <p>Pilot an F-22 stealth jet and defend the Strait of Hormuz from waves of Shahed kamikaze drones. Protect oil tankers, intercept SAM missiles, and survive endless waves of increasingly difficult enemies. Boss battles every 5th wave!</p>
+  </div>
+
+  <div class="mi-block">
+    <h2>CONTROLS</h2>
+    <div class="mi-controls-grid">
+      <div class="mi-ctrl-item">
+        <div class="icon">↔️</div>
+        <div class="label">TILT PHONE</div>
+        <div class="desc">Move jet left / right</div>
+      </div>
+      <div class="mi-ctrl-item">
+        <div class="icon">👆</div>
+        <div class="label">TAP SCREEN</div>
+        <div class="desc">Fire (hold = auto-fire)</div>
+      </div>
+      <div class="mi-ctrl-item">
+        <div class="icon">💣</div>
+        <div class="label">BOMB BUTTON</div>
+        <div class="desc">Clears all enemies</div>
+      </div>
+      <div class="mi-ctrl-item">
+        <div class="icon">⏸</div>
+        <div class="label">PAUSE BUTTON</div>
+        <div class="desc">Top-right corner</div>
+      </div>
     </div>
   </div>
-  <div id="action-zone">
-    <button id="btn-pause" class="touch-btn">PAUSE</button>
-    <button id="btn-bomb"  class="touch-btn">BOMB</button>
-    <button id="btn-fire"  class="touch-btn">FIRE</button>
+
+  <div class="mi-block">
+    <h2>POWER-UPS</h2>
+    <ul>
+      <li>🟣 TRIPLE — Triple shot spread</li>
+      <li>🟠 BOMB — Extra bomb charge</li>
+      <li>🟢 ♥ — Extra life</li>
+      <li>🔵 FAST — Speed boost</li>
+      <li>✡ SHIELD — Absorbs one hit (Israel shield)</li>
+    </ul>
+  </div>
+
+  <div class="mi-block">
+    <h2>TIPS</h2>
+    <ul>
+      <li>Save bombs for boss waves (every 5th)</li>
+      <li>Shoot down Kharg Island SAMs for +150 pts</li>
+      <li>Friendly tankers crossing the strait — protect them!</li>
+      <li>Triple Shot + Shield = maximum power combo</li>
+    </ul>
   </div>
 </div>
+
+<!-- Fixed mobile buttons (visible during gameplay only) -->
+<button id="mobile-bomb-btn" aria-label="Deploy Bomb">
+  <div class="bomb-icon">💣</div>
+  <div class="bomb-count" id="bomb-count-display">×2</div>
+</button>
+<button id="mobile-pause-btn" aria-label="Pause">⏸</button>
+
+<!-- Play button (part of intro, fixed at bottom) -->
+<button id="mobile-play-btn">▶ PLAY NOW</button>
 <script>
 // ================================================================
 //  HORMUZ DEFENDER — Full Arcade Edition
@@ -1195,7 +1328,7 @@ function drawTitle() {
 
   ctx.fillStyle= (Math.floor(Date.now()/400)%2===0) ? '#00ff88' : '#00cc66';
   ctx.font='bold 18px Courier New';
-  ctx.fillText(isTouchDevice ? '[ TAP SCREEN TO START ]' : '[ PRESS SPACE OR ENTER TO START ]', W/2, 520);
+  ctx.fillText('[ PRESS SPACE OR ENTER TO START ]', W/2, 520);
 }
 
 // ─── GAME OVER SCREEN ────────────────────────────────────────────
@@ -1228,7 +1361,7 @@ function drawGameOver() {
 
   ctx.fillStyle= (Math.floor(Date.now()/400)%2===0) ? '#00ff88' : '#00cc66';
   ctx.font='bold 16px Courier New';
-  ctx.fillText(isTouchDevice ? '[ TAP SCREEN TO RESTART ]' : '[ SPACE / ENTER to Restart  |  T for Title ]', W/2, 470);
+  ctx.fillText('[ SPACE / ENTER to Restart  |  T for Title ]', W/2, 470);
 }
 
 // ─── PAUSE SCREEN ────────────────────────────────────────────────
@@ -1839,106 +1972,106 @@ function loop() {
   }
 }
 
-// ─── TOUCH CONTROLS ──────────────────────────────────────────────
-function initTouchControls() {
-  const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-  if (!isTouch) return;
+// ─── MOBILE CONTROLS (tilt + tap) ────────────────────────────────
+let mobileMode = false;
 
-  // Show touch UI, hide keyboard hint
-  document.getElementById('touch-controls').style.display = 'flex';
+function initMobileControls() {
+  if (!isTouchDevice) return;
   document.getElementById('ctrl').style.display = 'none';
 
-  const joystickBase  = document.getElementById('joystick-base');
-  const joystickThumb = document.getElementById('joystick-thumb');
-  const btnFire  = document.getElementById('btn-fire');
-  const btnBomb  = document.getElementById('btn-bomb');
-  const btnPause = document.getElementById('btn-pause');
+  const intro      = document.getElementById('mobile-intro');
+  const playBtn    = document.getElementById('mobile-play-btn');
+  const bombBtn    = document.getElementById('mobile-bomb-btn');
+  const pauseBtn   = document.getElementById('mobile-pause-btn');
+  const bombCount  = document.getElementById('bomb-count-display');
+  const wrap       = document.getElementById('wrap');
 
-  const RADIUS = 38; // max thumb travel px from center
-  let joystickTouchId = null;
-  let jcx = 0, jcy = 0; // joystick center in page coords
+  // Show intro screen
+  intro.style.display = 'block';
 
-  function updateThumb(dx, dy) {
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    if (dist > RADIUS) { dx = dx/dist*RADIUS; dy = dy/dist*RADIUS; }
-    // position thumb around the center of the base
-    const half = joystickBase.offsetWidth / 2;
-    joystickThumb.style.left = (half + dx) + 'px';
-    joystickThumb.style.top  = (half + dy) + 'px';
-    const thresh = 14;
-    keys['ArrowLeft']  = dx < -thresh;
-    keys['ArrowRight'] = dx > thresh;
-    keys['ArrowUp']    = dy < -thresh;
-    keys['ArrowDown']  = dy > thresh;
+  // Keep bomb count in sync
+  function syncBombCount() {
+    if (bombCount) bombCount.textContent = '×' + bombs;
+  }
+  const origDeployBomb = deployBomb;
+  window.deployBomb = function() { origDeployBomb(); syncBombCount(); };
+
+  // ── PLAY button ──────────────────────────────────────────
+  playBtn.addEventListener('click', () => {
+    initAudio();
+    intro.style.display    = 'none';
+    playBtn.style.display  = 'none';
+
+    // Fullscreen
+    const el = document.documentElement;
+    if (el.requestFullscreen)            el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+
+    // Activate fullscreen game layout
+    wrap.classList.add('mobile-active');
+    mobileMode = true;
+
+    // Show game buttons
+    bombBtn.style.display  = 'flex';
+    pauseBtn.style.display = 'flex';
+
+    // Request tilt permission (iOS 13+) then setup
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission()
+        .then(r => { if (r === 'granted') setupTilt(); })
+        .catch(() => setupTilt());
+    } else {
+      setupTilt();
+    }
+
+    // Start game
+    initGame();
+    state = 'playing';
+    syncBombCount();
+  });
+
+  // ── TILT for left / right movement ───────────────────────
+  function setupTilt() {
+    const DEAD = 6;     // dead-zone degrees
+    const MAX  = 28;    // full-speed tilt degrees
+
+    window.addEventListener('deviceorientation', e => {
+      if (state !== 'playing') return;
+      const gamma = e.gamma || 0; // left-right: –90…+90
+
+      keys['ArrowLeft']  = gamma < -DEAD;
+      keys['ArrowRight'] = gamma > DEAD;
+
+      // Analogue speed via gamma magnitude (optional feel enhancement)
+      // The game uses boolean keys so just thresholds are enough
+    }, true);
   }
 
-  function resetThumb() {
-    const half = joystickBase.offsetWidth / 2;
-    joystickThumb.style.left = half + 'px';
-    joystickThumb.style.top  = half + 'px';
-    keys['ArrowLeft'] = keys['ArrowRight'] = keys['ArrowUp'] = keys['ArrowDown'] = false;
-  }
-
-  joystickBase.addEventListener('touchstart', e => {
-    e.preventDefault();
-    initAudio();
-    if (state === 'title' || state === 'gameover') { initGame(); state = 'playing'; return; }
-    if (joystickTouchId !== null) return;
-    const t = e.changedTouches[0];
-    joystickTouchId = t.identifier;
-    const r = joystickBase.getBoundingClientRect();
-    jcx = r.left + r.width  / 2;
-    jcy = r.top  + r.height / 2;
-    updateThumb(t.clientX - jcx, t.clientY - jcy);
-  }, { passive: false });
-
-  joystickBase.addEventListener('touchmove', e => {
-    e.preventDefault();
-    for (const t of e.changedTouches) {
-      if (t.identifier === joystickTouchId) updateThumb(t.clientX - jcx, t.clientY - jcy);
+  // ── TAP canvas = fire (touch start → hold = auto-fire) ───
+  canvas.addEventListener('touchstart', e => {
+    // Only fire in playing state — don't interfere with bomb/pause areas
+    if (state === 'playing') {
+      e.preventDefault();
+      keys[' '] = true;
     }
   }, { passive: false });
+  canvas.addEventListener('touchend',    () => { keys[' '] = false; }, { passive: true });
+  canvas.addEventListener('touchcancel', () => { keys[' '] = false; }, { passive: true });
 
-  joystickBase.addEventListener('touchend', e => {
+  // ── BOMB button ───────────────────────────────────────────
+  bombBtn.addEventListener('touchstart', e => {
     e.preventDefault();
-    for (const t of e.changedTouches) {
-      if (t.identifier === joystickTouchId) { joystickTouchId = null; resetThumb(); }
-    }
+    e.stopPropagation();
+    if (state === 'playing') { deployBomb(); syncBombCount(); }
   }, { passive: false });
 
-  joystickBase.addEventListener('touchcancel', e => {
-    joystickTouchId = null; resetThumb();
-  }, { passive: false });
-
-  // FIRE – hold to auto-fire (the update loop already handles keys[' '])
-  btnFire.addEventListener('touchstart', e => {
+  // ── PAUSE button ──────────────────────────────────────────
+  pauseBtn.addEventListener('touchstart', e => {
     e.preventDefault();
-    initAudio();
-    if (state === 'title' || state === 'gameover') { initGame(); state = 'playing'; return; }
-    keys[' '] = true;
-  }, { passive: false });
-  btnFire.addEventListener('touchend',   e => { e.preventDefault(); keys[' '] = false; }, { passive: false });
-  btnFire.addEventListener('touchcancel',e => { keys[' '] = false; }, { passive: false });
-
-  // BOMB
-  btnBomb.addEventListener('touchstart', e => {
-    e.preventDefault();
-    initAudio();
-    if (state === 'playing') deployBomb();
-  }, { passive: false });
-
-  // PAUSE
-  btnPause.addEventListener('touchstart', e => {
-    e.preventDefault();
+    e.stopPropagation();
     if (state === 'playing') state = 'paused';
     else if (state === 'paused') state = 'playing';
-  }, { passive: false });
-
-  // Tap anywhere on canvas to start / restart
-  canvas.addEventListener('touchstart', e => {
-    e.preventDefault();
-    initAudio();
-    if (state === 'title' || state === 'gameover') { initGame(); state = 'playing'; }
   }, { passive: false });
 }
 
@@ -1946,7 +2079,7 @@ function initTouchControls() {
 bgScroll = 0;
 // Pre-init player for title draw (won't be used until game starts)
 player = { x: WATER_L+WATER_W/2, y: H-100, w:90, h:72, vx:0, vy:0, shootTimer:0, invTimer:0 };
-initTouchControls();
+initMobileControls();
 loop();
 </script>
 
